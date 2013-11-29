@@ -11,20 +11,28 @@ var CONTACT2 = {id: id.fromKey('bar')};
 var CONTACT3 = {id: id.fromKey('glo')};
 var CONTACT4 = {id: id.fromKey('arf')};
 
-function addNext(table, n, cid, cb) {
-    table.store({id: cid}, function(err, added) {
+function addNext(table, n, cid, validate, cb) {
+    table.store({id: cid}, validate, function(err, added) {
         if (err) return cb(err);
-        addSome(table, n - 1, cb);
+        addSome(table, n - 1, validate, cb);
     });
 }
 
 // Add `n` random IDs to a table and call `cb(table)`.
 //
-function addSome(table, n, cb) {
+function addSome(table, n, validate, cb) {
     if (n === 0) return cb();
     id.generate(function(err, cid) {
         if (err) return cb(err);
-        addNext(table, n, cid, cb);
+        addNext(table, n, cid, validate, cb);
+    });
+}
+
+// Randomly validate or not a contact.
+//
+function randomValidate(contact, cb) {
+    process.nextTick(function() {
+        cb(null, Math.random() > 0.5);
     });
 }
 
@@ -69,7 +77,16 @@ describe('routing.RoutingTable', function() {
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
             var table = new routing.RoutingTable(id.fromKey('foo'));
-            addSome(table, 1000, function(err) {
+            addSome(table, 1000, null, function(err) {
+                if (err) return cb(err);
+                checkNode(table._root, []);
+                cb();
+            });
+        });
+
+        it('should work with invalidation', function(cb) {
+            var table = new routing.RoutingTable(id.fromKey('bar'));
+            addSome(table, 1000, randomValidate, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
                 cb();
