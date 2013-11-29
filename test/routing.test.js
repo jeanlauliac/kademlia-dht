@@ -11,14 +11,20 @@ var CONTACT2 = {id: id.fromKey('bar')};
 var CONTACT3 = {id: id.fromKey('glo')};
 var CONTACT4 = {id: id.fromKey('arf')};
 
+function addNext(table, n, cid, cb) {
+    table.store({id: cid}, function(err, added) {
+        if (err) return cb(err);
+        addSome(table, n - 1, cb);
+    });
+}
+
 // Add `n` random IDs to a table and call `cb(table)`.
 //
 function addSome(table, n, cb) {
     if (n === 0) return cb();
     id.generate(function(err, cid) {
         if (err) return cb(err);
-        table.store({id: cid});
-        addSome(table, n - 1, cb);
+        addNext(table, n, cid, cb);
     });
 }
 
