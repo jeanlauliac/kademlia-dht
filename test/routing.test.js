@@ -62,7 +62,7 @@ describe('routing.RoutingTable', function() {
 
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
-            var table = new routing.RoutingTable();
+            var table = new routing.RoutingTable(id.fromKey('foo'));
             addSome(table, 1000, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
