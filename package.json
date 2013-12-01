@@ -25,14 +25,17 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "~1.14.0",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "sinon": "~1.7.3",
+    "sinon-chai": "~2.4.0"
   },
   "engines": {
     "node": ">=0.6",
     "npm": "1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -R list",
+    "coverage": "istanbul cover _mocha -- -R spec"
   },
   "license": "MIT Expat"
 }
