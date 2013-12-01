@@ -54,6 +54,26 @@ function checkNode(node, prefix) {
 }
 
 describe('RoutingTable', function() {
+    describe('#split()', function() {
+        it('should split', function() {
+            var bucket = new Bucket(RoutingTable.BUCKET_SIZE);
+            bucket.store(CONTACT1);
+            bucket.store(CONTACT2);
+            bucket.store(CONTACT3);
+            bucket.store(CONTACT4);
+
+            var node = RoutingTable._splitBucket(bucket, 1);
+            node.left.size.should.equal(2);
+            node.right.size.should.equal(2);
+
+            node.left.obtain(2)[0].should.equal(CONTACT1);
+            node.left.obtain(2)[1].should.equal(CONTACT3);
+
+            node.right.obtain(2)[0].should.equal(CONTACT2);
+            node.right.obtain(2)[1].should.equal(CONTACT4);
+        });
+    });
+
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
             var table = new RoutingTable(Id.fromKey('foo'));
