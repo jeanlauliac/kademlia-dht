@@ -2,9 +2,9 @@
 
 require('chai').should();
 
-var routing     = require('../lib/routing.js');
-var Bucket      = require('../lib/bucket.js');
-var Id          = require('../lib/id.js');
+var RoutingTable    = require('../lib/routing-table.js');
+var Bucket          = require('../lib/bucket.js');
+var Id              = require('../lib/id.js');
 
 var CONTACT1 = {id: Id.fromKey('foo')};
 var CONTACT2 = {id: Id.fromKey('bar')};
@@ -53,30 +53,10 @@ function checkNode(node, prefix) {
     }
 }
 
-describe('routing.RoutingTable', function() {
-    describe('#split()', function() {
-        it('should split', function() {
-            var bucket = new Bucket(routing.BUCKET_SIZE);
-            bucket.store(CONTACT1);
-            bucket.store(CONTACT2);
-            bucket.store(CONTACT3);
-            bucket.store(CONTACT4);
-
-            var node = routing.split(bucket, 1);
-            node.left.size.should.equal(2);
-            node.right.size.should.equal(2);
-
-            node.left.obtain(2)[0].should.equal(CONTACT1);
-            node.left.obtain(2)[1].should.equal(CONTACT3);
-
-            node.right.obtain(2)[0].should.equal(CONTACT2);
-            node.right.obtain(2)[1].should.equal(CONTACT4);
-        });
-    });
-
+describe('RoutingTable', function() {
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
-            var table = new routing.RoutingTable(Id.fromKey('foo'));
+            var table = new RoutingTable(Id.fromKey('foo'));
             addSome(table, 1000, null, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
@@ -85,7 +65,7 @@ describe('routing.RoutingTable', function() {
         });
 
         it('should work with invalidation', function(cb) {
-            var table = new routing.RoutingTable(Id.fromKey('bar'));
+            var table = new RoutingTable(Id.fromKey('bar'));
             addSome(table, 1000, randomValidate, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
