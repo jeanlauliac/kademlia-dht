@@ -35,7 +35,7 @@
     "npm": "1"
   },
   "scripts": {
-    "test": "mocha -R list",
+    "test": "mocha -R list && jshint lib",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
   "license": "MIT Expat"

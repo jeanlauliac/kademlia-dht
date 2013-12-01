@@ -2,14 +2,14 @@
 
 require('chai').should();
 
-var routing = require('../lib/routing.js');
-var Bucket = require('../lib/bucket.js').Bucket;
-var id = require('../lib/id.js');
+var routing     = require('../lib/routing.js');
+var Bucket      = require('../lib/bucket.js');
+var Id          = require('../lib/id.js');
 
-var CONTACT1 = {id: id.fromKey('foo')};
-var CONTACT2 = {id: id.fromKey('bar')};
-var CONTACT3 = {id: id.fromKey('glo')};
-var CONTACT4 = {id: id.fromKey('arf')};
+var CONTACT1 = {id: Id.fromKey('foo')};
+var CONTACT2 = {id: Id.fromKey('bar')};
+var CONTACT3 = {id: Id.fromKey('glo')};
+var CONTACT4 = {id: Id.fromKey('arf')};
 
 function addNext(table, n, cid, validate, cb) {
     table.store({id: cid}, validate, function(err, added) {
@@ -22,7 +22,7 @@ function addNext(table, n, cid, validate, cb) {
 //
 function addSome(table, n, validate, cb) {
     if (n === 0) return cb();
-    id.generate(function(err, cid) {
+    Id.generate(function(err, cid) {
         if (err) return cb(err);
         addNext(table, n, cid, validate, cb);
     });
@@ -76,7 +76,7 @@ describe('routing.RoutingTable', function() {
 
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
-            var table = new routing.RoutingTable(id.fromKey('foo'));
+            var table = new routing.RoutingTable(Id.fromKey('foo'));
             addSome(table, 1000, null, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
@@ -85,7 +85,7 @@ describe('routing.RoutingTable', function() {
         });
 
         it('should work with invalidation', function(cb) {
-            var table = new routing.RoutingTable(id.fromKey('bar'));
+            var table = new routing.RoutingTable(Id.fromKey('bar'));
             addSome(table, 1000, randomValidate, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);

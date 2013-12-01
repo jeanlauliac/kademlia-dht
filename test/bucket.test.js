@@ -1,19 +1,19 @@
 'use strict';
 
 require('chai').should();
-var id      = require('../lib/id.js'),
-    bucket  = require('../lib/bucket.js');
+var Id      = require('../lib/id.js'),
+    Bucket  = require('../lib/bucket.js');
 
-var CONTACT1 = {id: id.fromKey('foo')},
-    CONTACT2 = {id: id.fromKey('bar')},
-    CONTACT3 = {id: id.fromKey('glo')},
-    CONTACT4 = {id: id.fromKey('arf')};
+var CONTACT1 = {id: Id.fromKey('foo')},
+    CONTACT2 = {id: Id.fromKey('bar')},
+    CONTACT3 = {id: Id.fromKey('glo')},
+    CONTACT4 = {id: Id.fromKey('arf')};
 
 describe('bucket', function() {
     var bt;
 
     before(function() {
-        bt = new bucket.Bucket(3);
+        bt = new Bucket(3);
     });
 
     describe('#store', function() {
