@@ -27,7 +27,8 @@
     "mocha": "~1.14.0",
     "chai": "~1.8.1",
     "sinon": "~1.7.3",
-    "sinon-chai": "~2.4.0"
+    "sinon-chai": "~2.4.0",
+    "jslint": "~0.2.5"
   },
   "engines": {
     "node": ">=0.6",

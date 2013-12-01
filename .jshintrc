@@ -1,0 +1,9 @@
+{
+    "indent": 4,
+    "quotmark": "single",
+    "maxparams": 4,
+    "maxdepth": 4,
+    "maxstatements": 20,
+    "maxlen": 80,
+    "node": true
+}
