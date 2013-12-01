@@ -26,8 +26,9 @@ describe('NodeMock', function () {
 
     describe('#ping()', function () {
         it('should ping', function (cb) {
-            var pingSpy = sinon.spy(function (cb) {
-                cb();
+            var pingSpy = sinon.spy(function (remoteEp, reply) {
+                remoteEp.should.equal(node1.endpoint);
+                reply();
             });
             node2.once('ping', pingSpy);
             node1.ping(node2.endpoint, function (err) {
@@ -38,7 +39,7 @@ describe('NodeMock', function () {
         });
 
         it('should timeout when no answer', function (cb) {
-            var pingSpy = sinon.spy(function (cb) {
+            var pingSpy = sinon.spy(function (reply) {
             });
             node2.once('ping', pingSpy);
             node1.ping(node2.endpoint, function(err) {
