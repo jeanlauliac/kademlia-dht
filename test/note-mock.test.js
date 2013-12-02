@@ -26,12 +26,12 @@ describe('NodeMock', function () {
 
     describe('#ping()', function () {
         it('should ping', function (cb) {
-            var pingSpy = sinon.spy(function (remoteEp, reply) {
-                remoteEp.should.equal(node1.endpoint);
+            var pingSpy = sinon.spy(function (endpoint, , reply) {
+                contact.endpoint.should.equal(node1.endpoint);
                 reply();
             });
             node2.once('ping', pingSpy);
-            node1.ping(node2.endpoint, function (err) {
+            node1.ping(node2.endpoint, null, function (err) {
                 should.not.exist(err);
                 pingSpy.should.be.have.been.called;
                 cb();
@@ -39,7 +39,7 @@ describe('NodeMock', function () {
         });
 
         it('should timeout when no answer', function (cb) {
-            var pingSpy = sinon.spy(function (reply) {
+            var pingSpy = sinon.spy(function () {
             });
             node2.once('ping', pingSpy);
             node1.ping(node2.endpoint, function(err) {
