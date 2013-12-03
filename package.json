@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "name": "kademlia-dht",
-  "description": "Modern, network-agnostic Kademlia Distributed Hash Table",
+  "description": "Network-agnostic Kademlia Distributed Hash Table",
   "keywords": [
     "kademlia",
     "dht",
@@ -35,7 +35,7 @@
     "npm": "1"
   },
   "scripts": {
-    "test": "mocha -R list && jshint lib",
+    "test": "mocha && jshint lib",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
   "license": "MIT Expat"
