@@ -31,7 +31,7 @@
     "jslint": "~0.2.5"
   },
   "engines": {
-    "node": ">=0.6",
+    "node": ">=0.10",
     "npm": "1"
   },
   "scripts": {
