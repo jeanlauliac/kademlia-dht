@@ -9,7 +9,7 @@ var CONTACT1 = {id: Id.fromKey('foo')},
     CONTACT3 = {id: Id.fromKey('glo')},
     CONTACT4 = {id: Id.fromKey('arf')};
 
-describe('bucket', function() {
+describe('Bucket', function() {
     var bt;
 
     before(function() {

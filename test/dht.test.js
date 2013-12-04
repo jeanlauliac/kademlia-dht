@@ -1,30 +1,37 @@
 'use strict';
 
 var Dht = require('../lib/dht.js');
-var MockRpc = require('../lib/mock-rpc.js');
+
+var SOURCE_ENDPOINT = 'localhost:9876';
+var TARGET_ENDPOINT = 'localhost:4321';
 
 describe('Dht', function () {
     var dht;
     var rpc;
     var spyTarget = {
-        ping: sinon.spy(function (contact, cb) {
-            cb();
-        })
+        ping: sinon.stub().callsArgAsync(2),
+        store: sinon.stub().callsArgAsync(4),
+        findNode: sinon.stub().callsArgAsync(3),
+        findValue: sinon.stub().callsArgAsync(3)
     };
 
     beforeEach(function (cb) {
-        spyTarget.reset();
-        rpc = new MockRpc({lemon: spyTarget}, 'apple');
-        Dht.spawn(rpc, function (err, inst) {
+        spyTarget.ping.reset();
+        spyTarget.store.reset();
+        spyTarget.findNode.reset();
+        spyTarget.findValue.reset();
+        Dht.spawn(spyTarget, function (err, inst) {
+            if (err) return cb(err);
             dht = inst;
+            return cb();
         });
     });
 
     describe('#ctor()', function () {
         it('should refuse bad RPC objects', function () {
-            expect(function throwing() {
+            (function throwing() {
                 new Dht({ping: function() {}});
-            }).to.throw(Error);
+            }).should.throw(Error);
         });
     });
 

@@ -3,7 +3,7 @@
 require('chai').should();
 var Id = require('../lib/id.js');
 
-describe('id', function() {
+describe('Id', function() {
     it('#generate() should generate proper id', function(cb) {
         Id.generate(function(err, id) {
             if (err) cb(err);
