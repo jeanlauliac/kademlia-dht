@@ -16,7 +16,7 @@ describe('Bucket', function() {
         bt = new Bucket(3);
     });
 
-    describe('#store', function() {
+    describe('#store()', function() {
         it('should store an item', function() {
             bt.store(CONTACT1);
             bt.obtain(1)[0].should.equal(CONTACT1);
@@ -51,7 +51,7 @@ describe('Bucket', function() {
         });
     });
 
-    describe('#obtain', function() {
+    describe('#obtain()', function() {
         it('should return a sublist', function() {
             var contacts = bt.obtain(2);
             contacts.length.should.equal(2);

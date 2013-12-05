@@ -1,7 +1,5 @@
 'use strict';
 
-require('chai').should();
-
 var RoutingTable    = require('../lib/routing-table.js');
 var Bucket          = require('../lib/bucket.js');
 var Id              = require('../lib/id.js');
@@ -10,6 +8,8 @@ var CONTACT1 = {id: Id.fromKey('foo')};
 var CONTACT2 = {id: Id.fromKey('bar')};
 var CONTACT3 = {id: Id.fromKey('glo')};
 var CONTACT4 = {id: Id.fromKey('arf')};
+
+var BUCKET_SIZE = 3;
 
 function addNext(table, n, cid, validate, cb) {
     table.store({id: cid}, validate, function(err, added) {
@@ -53,8 +53,16 @@ function checkNode(node, prefix) {
     }
 }
 
+function storeIds(table, ids, cb) {
+    if (ids.length === 0)
+        return cb();
+    table.store({id: ids[0]}, function () {
+        storeIds(table, ids.slice(1), cb);
+    });
+}
+
 describe('RoutingTable', function() {
-    describe('#split()', function() {
+    describe('#_splitBucket()', function() {
         it('should split', function() {
             var bucket = new Bucket(RoutingTable.BUCKET_SIZE);
             bucket.store(CONTACT1);
@@ -62,7 +70,7 @@ describe('RoutingTable', function() {
             bucket.store(CONTACT3);
             bucket.store(CONTACT4);
 
-            var node = RoutingTable._splitBucket(bucket, 1);
+            var node = RoutingTable._splitBucket(bucket, 1, 3);
             node.left.size.should.equal(2);
             node.right.size.should.equal(2);
 
@@ -76,7 +84,7 @@ describe('RoutingTable', function() {
 
     describe('#store()', function() {
         it('should observe the splitting rules', function(cb) {
-            var table = new RoutingTable(Id.fromKey('foo'));
+            var table = new RoutingTable(Id.fromKey('foo'), BUCKET_SIZE);
             addSome(table, 1000, null, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
@@ -85,12 +93,32 @@ describe('RoutingTable', function() {
         });
 
         it('should work with invalidation', function(cb) {
-            var table = new RoutingTable(Id.fromKey('bar'));
+            var table = new RoutingTable(Id.fromKey('bar'), BUCKET_SIZE);
             addSome(table, 1000, randomValidate, function(err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
                 cb();
             });
         });
+
+        it('should work deeply nested', function(cb) {
+            var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
+            var bits = [];
+            var ids = [];
+
+            for (var i = 0; i < Id.BIT_SIZE - 1; ++i) {
+                ids.push(Id.fromPrefix(bits.concat(false)));
+                ids.push(Id.fromPrefix(bits.concat(true)));
+                bits.push(false);
+            };
+            storeIds(table, ids, function() {
+                checkNode(table._root, []);
+                cb();
+            });
+        });
+    });
+
+    describe('#find()', function() {
+
     });
 });
