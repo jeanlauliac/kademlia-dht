@@ -64,13 +64,13 @@ function storeIds(table, ids, cb) {
 describe('RoutingTable', function() {
     describe('#_splitBucket()', function() {
         it('should split', function() {
-            var bucket = new Bucket(RoutingTable.BUCKET_SIZE);
+            var bucket = new Bucket(4);
             bucket.store(CONTACT1);
             bucket.store(CONTACT2);
             bucket.store(CONTACT3);
             bucket.store(CONTACT4);
 
-            var node = RoutingTable._splitBucket(bucket, 1, 3);
+            var node = RoutingTable._splitBucket(bucket, 1, 4);
             node.left.size.should.equal(2);
             node.right.size.should.equal(2);
 
@@ -119,6 +119,18 @@ describe('RoutingTable', function() {
     });
 
     describe('#find()', function() {
+            // var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
+            // var bits = [];
+            // var ids = [];
 
+            // for (var i = 0; i < 10; ++i) {
+            //     ids.push(Id.fromPrefix(bits.concat(false)));
+            //     ids.push(Id.fromPrefix(bits.concat(true)));
+            //     bits.push(false);
+            // };
+            // storeIds(table, ids, function() {
+            //     console.log(table);
+            //     cb();
+            // });
     });
 });

@@ -40,7 +40,7 @@ describe('Dht', function () {
         describe('#set()', function () {
             it('should work', function () {
                 dht.set('foo', 12, function() {
-                    dht.peek('foo')
+                    dht.peek('foo');
                 });
             });
         });
