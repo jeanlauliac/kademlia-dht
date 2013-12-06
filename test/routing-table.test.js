@@ -119,18 +119,25 @@ describe('RoutingTable', function() {
     });
 
     describe('#find()', function() {
-            // var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
-            // var bits = [];
-            // var ids = [];
+        it('should work', function(cb) {
+            var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
+            var bits = [];
+            var ids = [];
 
-            // for (var i = 0; i < 10; ++i) {
-            //     ids.push(Id.fromPrefix(bits.concat(false)));
-            //     ids.push(Id.fromPrefix(bits.concat(true)));
-            //     bits.push(false);
-            // };
-            // storeIds(table, ids, function() {
-            //     console.log(table);
-            //     cb();
-            // });
+            for (var i = 0; i < 10; ++i) {
+                ids.push(Id.fromPrefix(bits.concat(false)));
+                ids.push(Id.fromPrefix(bits.concat(true)));
+                bits.push(false);
+            };
+            storeIds(table, ids, function() {
+                var ids = table.find(Id.fromPrefix('000000111'));
+                ids = ids.map(function (x) {return x.id.toString()});
+                ids.length.should.equal(BUCKET_SIZE);
+                ids[0].should.equal('0200000000000000000000000000000000000000');
+                ids[1].should.equal('0100000000000000000000000000000000000000');
+                ids[2].should.equal('0080000000000000000000000000000000000000');
+                cb();
+            });
+        });
     });
 });

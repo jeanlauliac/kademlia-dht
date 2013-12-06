@@ -1,6 +1,5 @@
 'use strict';
 
-require('chai').should();
 var Id = require('../lib/id.js');
 
 describe('Id', function() {
@@ -59,6 +58,17 @@ describe('Id', function() {
             var target = 'd4a6bfe55a3715cad428cedd03de6e39a04b43b6';
             dist.toString('hex').should.equal(target);
         })
+    });
+
+    describe('#compareDistance()', function () {
+        it('should work', function () {
+            var id  = Id.fromPrefix('001100101');
+            var id1 = Id.fromPrefix('011110011');
+            var id2 = Id.fromPrefix('001010101');
+            id.compareDistance(id1, id2).should.be.below(0);
+            id.compareDistance(id2, id1).should.be.above(0);
+            id.compareDistance(id1, id1).should.equal(0);
+        });
     });
 
     describe('#equal()', function () {
