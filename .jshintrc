@@ -6,5 +6,10 @@
     "maxstatements": 20,
     "maxlen": 80,
     "node": true,
-    "white": true
+    "white": true,
+    "globals": {
+        "describe": false,
+        "beforeEach": false,
+        "it": false
+    }
 }

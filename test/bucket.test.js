@@ -1,60 +1,96 @@
 'use strict';
 
-require('chai').should();
-var Id      = require('../lib/id.js'),
-    Bucket  = require('../lib/bucket.js');
+var Id = require('../lib/id.js');
+var Bucket = require('../lib/bucket.js');
 
-var CONTACT1 = {id: Id.fromKey('foo')},
-    CONTACT2 = {id: Id.fromKey('bar')},
-    CONTACT3 = {id: Id.fromKey('glo')},
-    CONTACT4 = {id: Id.fromKey('arf')};
+var Contacts = [
+    {id: Id.fromKey('foo')},
+    {id: Id.fromKey('bar')},
+    {id: Id.fromKey('glo')},
+    {id: Id.fromKey('arf')}
+];
 
-describe('Bucket', function() {
+describe('Bucket', function () {
     var bt;
 
-    before(function() {
+    beforeEach(function () {
         bt = new Bucket(3);
     });
 
-    describe('#store()', function() {
-        it('should store an item', function() {
-            bt.store(CONTACT1);
-            bt.obtain(1)[0].should.equal(CONTACT1);
-            bt.size.should.equal(1);
+    describe('#store()', function () {
+        it('should store an item', function () {
+            bt.store(Contacts[0]);
+            bt.obtain(1)[0].should.equal(Contacts[0]);
+            bt.length.should.equal(1);
         });
 
-        it('should store other items', function() {
-            bt.store(CONTACT2);
-            bt.store(CONTACT3);
+        it('should store other items', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.store(Contacts[2]);
+            bt.length.should.equal(3);
             var contacts = bt.obtain(3);
-            contacts[1].should.equal(CONTACT2);
-            contacts[2].should.equal(CONTACT3);
-            bt.size.should.equal(3);
+            contacts[1].should.equal(Contacts[1]);
+            contacts[2].should.equal(Contacts[2]);
         });
 
-        it('should refresh items', function() {
-            bt.store(CONTACT2);
+        it('should refresh items', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.store(Contacts[2]);
+            bt.store(Contacts[1]);
+            bt.length.should.equal(3);
             var contacts = bt.obtain(3);
-            contacts[0].should.equal(CONTACT1);
-            contacts[1].should.equal(CONTACT3);
-            contacts[2].should.equal(CONTACT2);
-            bt.size.should.equal(3);
+            contacts[0].should.equal(Contacts[0]);
+            contacts[1].should.equal(Contacts[2]);
+            contacts[2].should.equal(Contacts[1]);
         });
 
-        it('shouldn\'t accept more items', function() {
-            bt.store(CONTACT4);
+        it('shouldn\'t accept more items', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.store(Contacts[2]);
+            bt.store(Contacts[3]);
+            bt.length.should.equal(3);
             var contacts = bt.obtain(3);
-            contacts[0].should.equal(CONTACT1);
-            contacts[1].should.equal(CONTACT3);
-            contacts[2].should.equal(CONTACT2);
-            bt.size.should.equal(3);
+            contacts[0].should.equal(Contacts[0]);
+            contacts[1].should.equal(Contacts[1]);
+            contacts[2].should.equal(Contacts[2]);
         });
     });
 
-    describe('#obtain()', function() {
-        it('should return a sublist', function() {
+    describe('#obtain()', function () {
+        it('should return a sublist', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.store(Contacts[2]);
             var contacts = bt.obtain(2);
             contacts.length.should.equal(2);
         });
     });
+
+    describe('#toString()', function () {
+        it('should work with empty list', function () {
+            bt.toString().should.equal('<( :3: )>');
+        });
+
+        it('should work with some items', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.toString().should.equal('<( ' + Contacts[0].id.toString(true) +
+                                       ' ' + Contacts[1].id.toString(true) +
+                                       ' :1: )>');
+        });
+
+        it('should work being full', function () {
+            bt.store(Contacts[0]);
+            bt.store(Contacts[1]);
+            bt.store(Contacts[2]);
+            bt.toString().should.equal('<( ' + Contacts[0].id.toString(true) +
+                                       ' ' + Contacts[1].id.toString(true) +
+                                       ' ' + Contacts[2].id.toString(true) +
+                                       ' )>');
+        });
+    });
+
 });
