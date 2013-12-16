@@ -35,6 +35,18 @@ describe('Id', function() {
         });
     });
 
+    describe('.fromHex()', function () {
+        it('should work with prefix', function () {
+            var id = Id.fromHex('abcd');
+            id.toString(true).should.equal('abcd0..00');
+        });
+
+        it('should work with both prefix and suffix', function () {
+            var id = Id.fromHex('abcd', '1234');
+            id.toString(true).should.equal('abcd0..34');
+        });
+    });
+
     describe('#distanceTo()', function () {
         it('should yield zero', function () {
             var id = Id.fromKey('the cake is a lie')

@@ -16,38 +16,33 @@ describe('MockRpc', function () {
         rpc2 = new MockRpc(TARGET_ENDPOINT);
     });
 
-    describe('#ping()', function () {
-        it('should ping', function (cb) {
-            var targetSpy = {
-                ping: sinon.spy(function (contact, reply) {
-                    contact.id.should.equal(SOURCE_ID);
-                    contact.endpoint.should.equal(SOURCE_ENDPOINT);
-                    reply();
-                })
-            };
-            rpc2.recipient(targetSpy);
-            rpc.ping(TARGET_ENDPOINT, SOURCE_ID, function (err) {
+    describe('#send()', function () {
+        it('should callback when the message is replied to', function (cb) {
+            rpc2.receive('ping', sinon.spy(function (endpoint, payload, cb) {
+                payload.id.should.equal(SOURCE_ID);
+                endpoint.should.equal(SOURCE_ENDPOINT);
+                cb();
+            }));
+            rpc.send(TARGET_ENDPOINT, 'ping', {id: SOURCE_ID}, function (err) {
                 should.not.exist(err);
-                targetSpy.ping.should.be.have.been.called;
+                rpc2.receive('ping').should.be.have.been.called;
                 cb();
             });
         });
 
         it('should timeout when no answer', function (cb) {
-            var targetSpy = {
-                ping: sinon.spy()
-            };
-            rpc2.recipient(targetSpy);
-            rpc.ping(TARGET_ENDPOINT, SOURCE_ID, function(err) {
+            rpc2.receive('ping', sinon.spy());
+            rpc.send(TARGET_ENDPOINT, 'ping', {id: SOURCE_ID}, function(err) {
                 should.exist(err);
                 err.code.should.equal('ETIMEDOUT');
-                targetSpy.ping.should.be.have.been.called;
+                rpc2.receive('ping').should.be.have.been.called;
                 cb();
             });
         });
 
         it('should timeout when no remote node', function (cb) {
-            rpc.ping('invalid endpoint', SOURCE_ID, function (err) {
+            rpc.send('invalid endpoint', 'ping', {id: SOURCE_ID},
+                     function (err) {
                 should.exist(err);
                 err.code.should.equal('ETIMEDOUT');
                 cb();

@@ -10,6 +10,8 @@
     "globals": {
         "describe": false,
         "beforeEach": false,
-        "it": false
+        "it": false,
+        "sinon": false,
+        "should": false
     }
 }

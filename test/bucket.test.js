@@ -2,12 +2,13 @@
 
 var Id = require('../lib/id.js');
 var Bucket = require('../lib/bucket.js');
+var Contact = require('../lib/contact.js');
 
 var Contacts = [
-    {id: Id.fromKey('foo')},
-    {id: Id.fromKey('bar')},
-    {id: Id.fromKey('glo')},
-    {id: Id.fromKey('arf')}
+    new Contact(Id.fromKey('foo')),
+    new Contact(Id.fromKey('bar')),
+    new Contact(Id.fromKey('glo')),
+    new Contact(Id.fromKey('arf'))
 ];
 
 describe('Bucket', function () {
