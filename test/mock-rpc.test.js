@@ -23,7 +23,7 @@ describe('MockRpc', function () {
                 endpoint.should.equal(SOURCE_ENDPOINT);
                 cb();
             }));
-            rpc.send(TARGET_ENDPOINT, 'ping', {id: SOURCE_ID}, function (err) {
+            rpc.send('ping', TARGET_ENDPOINT, {id: SOURCE_ID}, function (err) {
                 should.not.exist(err);
                 rpc2.receive('ping').should.be.have.been.called;
                 cb();
@@ -32,7 +32,7 @@ describe('MockRpc', function () {
 
         it('should timeout when no answer', function (cb) {
             rpc2.receive('ping', sinon.spy());
-            rpc.send(TARGET_ENDPOINT, 'ping', {id: SOURCE_ID}, function(err) {
+            rpc.send('ping', TARGET_ENDPOINT, {id: SOURCE_ID}, function(err) {
                 should.exist(err);
                 err.code.should.equal('ETIMEDOUT');
                 rpc2.receive('ping').should.be.have.been.called;
@@ -41,7 +41,7 @@ describe('MockRpc', function () {
         });
 
         it('should timeout when no remote node', function (cb) {
-            rpc.send('invalid endpoint', 'ping', {id: SOURCE_ID},
+            rpc.send('ping', 'invalid endpoint', {id: SOURCE_ID},
                      function (err) {
                 should.exist(err);
                 err.code.should.equal('ETIMEDOUT');

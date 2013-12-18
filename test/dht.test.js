@@ -8,8 +8,6 @@ var TARGET_ENDPOINT = 'localhost:4321';
 
 function spawnNodeFromRpc(rpc, seed, cb) {
     Dht.spawn(rpc, seed, function (err, dht) {
-        if (err) return cb(err);
-        rpc.recipient(dht);
         return cb(err, dht);
     });
 }
@@ -31,7 +29,7 @@ function spawnSomeNodesRecur(arr, nb, cb) {
             return cb(null, arr);
         });
     }
-    spawnNode('localhost' + nextGlobalEpIndex, null, function (err, node) {
+    spawnNode('localhost:' + nextGlobalEpIndex, null, function (err, node) {
         if (err) return cb(err);
         arr.push(node);
         return spawnSomeNodesRecur(arr, nb - 1, cb);
@@ -45,7 +43,6 @@ function spawnSomeNodes(nb, cb) {
 }
 
 describe('Dht', function () {
-
     describe('constructor', function () {
         it('should refuse bad RPC objects', function () {
             (function throwing() {
@@ -54,39 +51,24 @@ describe('Dht', function () {
         });
     });
 
-    describe('member', function () {
-        var dht;
-        var rpc;
-        var spyTarget = {
-            ping: sinon.stub().callsArgAsync(2),
-            store: sinon.stub().callsArgAsync(4),
-            findNode: sinon.stub().callsArgAsync(3),
-            findValue: sinon.stub().callsArgAsync(3)
-        };
-
-        beforeEach(function (cb) {
-            spyTarget.ping.reset();
-            spyTarget.store.reset();
-            spyTarget.findNode.reset();
-            spyTarget.findValue.reset();
-            Dht.spawn(spyTarget, function (err, inst) {
-                if (err) return cb(err);
-                dht = inst;
-                return cb();
-            });
-        });
-
-        describe('#set()', function () {
-            it('should work locally', function () {
-                dht.set('foo', 12, function () {
+    describe('#set()', function () {
+        it('should store locally, with error', function (cb) {
+            spawnNode('localhost', [], function (err, dht) { 
+                should.not.exist(err);
+                dht.set('foo', 12, function (err) {
+                    should.exist(err);
                     dht.peek('foo').should.equal(12);
+                    cb();
                 });
             });
         });
     });
 
-    describe('load test', function () {
-
-
+    it('should store and get with a lot of nodes', function() {
+        spawnSomeNodes(100, function (err, dhts) {
+            should.not.exist(err);
+            var dht = dhts[0];
+            
+        });
     });
 });
