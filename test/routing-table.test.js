@@ -12,28 +12,14 @@ var CONTACT4 = new Contact(Id.fromKey('arf'));
 
 var BUCKET_SIZE = 3;
 
-function addNext(table, n, cid, validate, cb) {
-    table.store(new Contact(cid), validate, function (err, added) {
-        if (err) return cb(err);
-        addSome(table, n - 1, validate, cb);
-    });
-}
-
 // Add `n` random IDs to a table and call `cb(table)`.
 //
-function addSome(table, n, validate, cb) {
+function addSome(table, n, cb) {
     if (n === 0) return cb();
     Id.generate(function (err, cid) {
         if (err) return cb(err);
-        addNext(table, n, cid, validate, cb);
-    });
-}
-
-// Randomly validate or not a contact.
-//
-function randomValidate(contact, cb) {
-    process.nextTick(function () {
-        cb(null, Math.random() > 0.5);
+        table.store(new Contact(cid));
+        addSome(table, n - 1, cb);
     });
 }
 
@@ -55,11 +41,8 @@ function checkNode(node, prefix) {
 }
 
 function storeIds(table, ids, cb) {
-    if (ids.length === 0)
-        return cb();
-    table.store(new Contact(ids[0]), function () {
-        storeIds(table, ids.slice(1), cb);
-    });
+    for (var i = 0; i < ids.length; ++i)
+        table.store(new Contact(ids[i]));
 }
 
 describe('RoutingTable', function () {
@@ -86,23 +69,14 @@ describe('RoutingTable', function () {
     describe('#store()', function () {
         it('should observe the splitting rules', function (cb) {
             var table = new RoutingTable(Id.fromKey('foo'), BUCKET_SIZE);
-            addSome(table, 1000, null, function (err) {
+            addSome(table, 1000, function (err) {
                 if (err) return cb(err);
                 checkNode(table._root, []);
                 cb();
             });
         });
 
-        it('should work with invalidation', function (cb) {
-            var table = new RoutingTable(Id.fromKey('bar'), BUCKET_SIZE);
-            addSome(table, 1000, randomValidate, function (err) {
-                if (err) return cb(err);
-                checkNode(table._root, []);
-                cb();
-            });
-        });
-
-        it('should work deeply nested', function (cb) {
+        it('should work deeply nested', function () {
             var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
             var bits = [];
             var ids = [];
@@ -112,15 +86,13 @@ describe('RoutingTable', function () {
                 ids.push(Id.fromPrefix(bits.concat(true)));
                 bits.push(false);
             }
-            storeIds(table, ids, function () {
-                checkNode(table._root, []);
-                cb();
-            });
+            storeIds(table, ids);
+            checkNode(table._root, []);
         });
     });
 
     describe('#find()', function () {
-        it('should work', function (cb) {
+        it('should work', function () {
             var table = new RoutingTable(Id.zero(), BUCKET_SIZE);
             var bits = [];
             var ids = [];
@@ -130,17 +102,15 @@ describe('RoutingTable', function () {
                 ids.push(Id.fromPrefix(bits.concat(true)));
                 bits.push(false);
             }
-            storeIds(table, ids, function () {
-                var ids = table.find(Id.fromPrefix('000000111'));
-                ids = ids.map(function (x) {
-                    return x.id.toString(true);
-                });
-                ids.length.should.equal(BUCKET_SIZE);
-                ids[0].should.equal('02000..00');
-                ids[1].should.equal('01000..00');
-                ids[2].should.equal('00800..00');
-                cb();
+            storeIds(table, ids);
+            ids = table.find(Id.fromPrefix('000000111'));
+            ids = ids.map(function (x) {
+                return x.id.toString(true);
             });
+            ids.length.should.equal(BUCKET_SIZE);
+            ids[0].should.equal('02000..00');
+            ids[1].should.equal('01000..00');
+            ids[2].should.equal('00800..00');
         });
     });
 });

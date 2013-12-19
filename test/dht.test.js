@@ -33,7 +33,7 @@ function spawnSomeNodesRecur(arr, seeds, nb, cb) {
         ++nextGlobalEpIndex;
         if (err) return cb(err);
         arr.push(dht);
-        if (seeds.length < 10)
+        if (seeds.length < 3)
             seeds.push(dht.rpc.endpoint);
         return spawnSomeNodesRecur(arr, seeds, nb - 1, cb);
     });
@@ -68,16 +68,22 @@ describe('Dht', function () {
     });
 
     it('should store and get with a lot of nodes', function (cb) {
-        spawnSomeNodes(3, function (err, dhts) {
-            console.log();
-            for (var i = 0; i < dhts.length; ++i) {
-                console.log('=== %s ===\n%s', dhts[i].rpc.endpoint,
-                            dhts[i]._routes);
-            }
+        spawnSomeNodes(100, function (err, dhts) {
             should.not.exist(err);
             dhts.should.have.length(100);
             var dht = dhts[0];
-            cb();
+            dht.set('foo', 42, function (err) {
+                should.not.exist(err);
+                dht.peek('foo').should.equal(42);
+                for (var i = 0; i < dhts.length; ++i) {
+                    if (!dhts[i].peek('foo')) break;
+                }
+                i.should.not.equal(dhts.length);
+                dhts[i].get('foo', function (err, value) {
+                    value.should.equal(42);
+                    cb();
+                });
+            });
         });
     });
 });
