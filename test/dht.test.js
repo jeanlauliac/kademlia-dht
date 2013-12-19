@@ -17,29 +17,32 @@ function spawnNodeFromRpc(rpc, seed, cb) {
 function spawnNode(endpoint, seed, cb) {
     MockRpc.spawn(endpoint, function (err, rpc) {
         if (err) return cb(err);
-        return spawnNodeFromRpc(rpc, cb);
+        return spawnNodeFromRpc(rpc, seed, cb);
     });
 }
 
 var nextGlobalEpIndex = 1000;
 
-function spawnSomeNodesRecur(arr, nb, cb) {
+function spawnSomeNodesRecur(arr, seeds, nb, cb) {
     if (nb === 0) {
         return process.nextTick(function () {
             return cb(null, arr);
         });
     }
-    spawnNode('localhost:' + nextGlobalEpIndex, null, function (err, node) {
+    spawnNode('localhost:' + nextGlobalEpIndex, seeds, function (err, dht) {
+        ++nextGlobalEpIndex;
         if (err) return cb(err);
-        arr.push(node);
-        return spawnSomeNodesRecur(arr, nb - 1, cb);
+        arr.push(dht);
+        if (seeds.length < 10)
+            seeds.push(dht.rpc.endpoint);
+        return spawnSomeNodesRecur(arr, seeds, nb - 1, cb);
     });
 }
 
 // Spawn `count` nodes with unique endpoints.
 //
 function spawnSomeNodes(nb, cb) {
-    spawnSomeNodesRecur([], nb, cb);
+    spawnSomeNodesRecur([], [], nb, cb);
 }
 
 describe('Dht', function () {
@@ -53,7 +56,7 @@ describe('Dht', function () {
 
     describe('#set()', function () {
         it('should store locally, with error', function (cb) {
-            spawnNode('localhost', [], function (err, dht) { 
+            spawnNode('localhost', [], function (err, dht) {
                 should.not.exist(err);
                 dht.set('foo', 12, function (err) {
                     should.exist(err);
@@ -64,11 +67,17 @@ describe('Dht', function () {
         });
     });
 
-    it('should store and get with a lot of nodes', function() {
-        spawnSomeNodes(100, function (err, dhts) {
+    it('should store and get with a lot of nodes', function (cb) {
+        spawnSomeNodes(3, function (err, dhts) {
+            console.log();
+            for (var i = 0; i < dhts.length; ++i) {
+                console.log('=== %s ===\n%s', dhts[i].rpc.endpoint,
+                            dhts[i]._routes);
+            }
             should.not.exist(err);
+            dhts.should.have.length(100);
             var dht = dhts[0];
-            
+            cb();
         });
     });
 });

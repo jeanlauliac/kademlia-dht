@@ -16,6 +16,10 @@ describe('MockRpc', function () {
         rpc2 = new MockRpc(TARGET_ENDPOINT);
     });
 
+    it('#endpoint should be correct', function () {
+        rpc.endpoint.should.equal(SOURCE_ENDPOINT);
+    });
+
     describe('#send()', function () {
         it('should callback when the message is replied to', function (cb) {
             rpc2.receive('ping', sinon.spy(function (endpoint, payload, cb) {
