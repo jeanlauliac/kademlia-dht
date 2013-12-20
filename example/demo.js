@@ -7,7 +7,9 @@ var MockRpc = require('../lib/mock-rpc');
 //
 function demo(dht1, dht2) {
     dht1.set('beep', 'boop', function (err) {
+        if (err) throw err;
         dht2.get('beep', function (err, value) {
+            if (err) throw err;
             console.log('%s === %s', 'boop', value);
         });
     });
