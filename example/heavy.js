@@ -42,7 +42,7 @@ function doStuff(dhts, count) {
             key += WORDS[Math.random() * WORDS.length | 0];
         }
         var ix = Math.random() * dhts.length | 0;
-        if (Math.random() < 0.333) {
+        if (Math.random() < 0.5) {
             var value = Math.random() * 256 | 0;
             console.log('[master] set %s=%d on #%s', key, value,
                         dhts[ix].rpc.endpoint);
@@ -51,7 +51,7 @@ function doStuff(dhts, count) {
                 if (err) return console.log('  ERROR! %s', err.message);
                 doStuff(dhts, count - 1);
             });
-        } else if (Math.random() < 0.666) {
+        } else if (Math.random() < 1) {
             console.log('[master] get %s on #%s', key, dhts[ix].rpc.endpoint);
             dhts[ix].get(key, function (err, value) {
                 if (err) return console.log('  ERROR! %s', err.message);
