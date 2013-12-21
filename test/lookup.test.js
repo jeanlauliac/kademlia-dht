@@ -38,7 +38,8 @@ function fakeFindNode(contact, targetId, cb) {
 var opts = {
     size: BUCKET_SIZE,
     concurrency: 3,
-    findNode: fakeFindNode
+    findNode: fakeFindNode,
+    selfId: Id.zero()
 };
 
 it('fakeFindNode should return Ids closer to the target', function (cb) {
