@@ -55,11 +55,11 @@ describe('Dht', function () {
     });
 
     describe('#set()', function () {
-        it('should store locally, with error', function (cb) {
+        it('should store locally without error', function (cb) {
             spawnNode('localhost', [], function (err, dht) {
                 should.not.exist(err);
                 dht.set('foo', 12, function (err) {
-                    should.exist(err);
+                    should.not.exist(err);
                     dht.peek('foo').should.equal(12);
                     cb();
                 });
