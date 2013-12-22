@@ -31,16 +31,13 @@ function spawnSome(dhts, seeds, nb, cb) {
     });
 }
 
-var WORDS = ['foo']; //, 'bar']; //, 'baz', 'glo', 'ick'];
+var WORDS = ['foo', 'bar', 'baz', 'glo', 'ick'];
 var locals = {};
 
 function doStuff(dhts, count) {
     setTimeout(function () {
         if (count === 0) return;
-        var key = '';
-        for (var i = 0; i < 1; ++i) {
-            key += WORDS[Math.random() * WORDS.length | 0];
-        }
+        var key = WORDS[Math.random() * WORDS.length | 0];
         var ix = Math.random() * dhts.length | 0;
         if (Math.random() < 0.5) {
             var value = Math.random() * 256 | 0;
@@ -75,7 +72,7 @@ function doStuff(dhts, count) {
     }, (Math.random() * 20) | 0);
 }
 
-spawnSome([], [], 20, function (err, dhts) {
+spawnSome([], [], 100, function (err, dhts) {
     if (err) throw err;
     doStuff(dhts, 200);
 });
