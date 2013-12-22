@@ -35,9 +35,9 @@ var WORDS = ['foo', 'bar', 'baz']; //, 'glo', 'ick'];
 var locals = {};
 
 
-function setSome(dhts, key, ix, cb) {
+function setSome(name, dhts, key, ix, cb) {
     var value = Math.random() * 256 | 0;
-    console.log('[master] set %s=%d on #%s', key, value,
+    console.log('[%s] set %s=%d on #%s', name, key, value,
                 dhts[ix].rpc.endpoint);
     locals[key] = value;
     dhts[ix].set(key, value, function (err) {
@@ -46,8 +46,8 @@ function setSome(dhts, key, ix, cb) {
     });
 }
 
-function getSome(dhts, key, ix, cb) {
-    console.log('[master] get %s on #%s', key, dhts[ix].rpc.endpoint);
+function getSome(name, dhts, key, ix, cb) {
+    console.log('[%s] get %s on #%s', name, key, dhts[ix].rpc.endpoint);
     dhts[ix].get(key, function (err, value) {
         if (err) return console.log('  ERROR! %s', err.message);
         if (value !== locals[key]) {
@@ -59,19 +59,19 @@ function getSome(dhts, key, ix, cb) {
     });
 }
 
-function newNode(dhts, cb) {
+function newNode(name, dhts, cb) {
     var seeds = [dhts[Math.random() * dhts.length | 0].rpc.endpoint];
     spawnNode('local:' + nextPort, seeds, function (err, dht) {
         ++nextPort;
         if (err) return console.log('  ERROR! %s', err.message);
         dhts.push(dht);
-        console.log('[master] NEW node! %s', dht.rpc.endpoint);
+        console.log('[%s] NEW node! %s', name, dht.rpc.endpoint);
         cb();
     });
 }
 
-function oldNode(dhts, ix, cb) {
-    console.log('[master] REMOVING node! %s', dhts[ix].rpc.endpoint);
+function oldNode(name, dhts, ix, cb) {
+    console.log('[%s] REMOVING node! %s', name, dhts[ix].rpc.endpoint);
     dhts[ix].close();
     dhts.splice(ix, 1);
     process.nextTick(function () {
@@ -79,31 +79,34 @@ function oldNode(dhts, ix, cb) {
     });
 }
 
-var degree = 4;
+var degree = 6;
 
-function doStuff(dhts, count) {
+function doStuff(name, dhts, count) {
     setTimeout(function () {
         if (count === 0) return;
         var key = WORDS[Math.random() * WORDS.length | 0];
         var ix = Math.random() * dhts.length | 0;
         var action = Math.random() * degree | 0;
         function cont() {
-            doStuff(dhts, count - 1);
+            doStuff(name, dhts, count - 1);
         }
         switch (action) {
             case 0:
-                return setSome(dhts, key, ix, cont);
             case 1:
-                return getSome(dhts, key, ix, cont);
+                return setSome(name, dhts, key, ix, cont);
             case 2:
-                return newNode(dhts, cont);
             case 3:
-                return oldNode(dhts, ix, cont);
+                return getSome(name, dhts, key, ix, cont);
+            case 4:
+                return newNode(name, dhts, cont);
+            case 5:
+                return oldNode(name, dhts, ix, cont);
         }
     }, (Math.random() * 20) | 0);
 }
 
 spawnSome([], [], 100, function (err, dhts) {
     if (err) throw err;
-    doStuff(dhts, 200);
+    doStuff('1', dhts, 100);
+    doStuff('2', dhts, 100);
 });
