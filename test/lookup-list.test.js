@@ -6,14 +6,14 @@ var LookupList = require('../lib/lookup-list.js');
 
 describe('LookupList', function () {
     it('constructor should create empty list', function () {
-        var list = new LookupList(Id.zero(), Id.zero(), 3);
+        var list = new LookupList(Id.zero(), 3);
         list.length.should.equal(0);
         list.capacity.should.equal(3);
     });
 
     describe('#insert()', function () {
         it('should fill the list', function (cb) {
-            var list = new LookupList(Id.zero(), Id.zero(), 20);
+            var list = new LookupList(Id.zero(), 20);
             generateIds(10, function (err, ids) {
                 for (var i = 0; i < ids.length; ++i) {
                     list.insert(new Contact(ids[i]));
@@ -25,7 +25,7 @@ describe('LookupList', function () {
 
         it('should observe ordering', function (cb) {
             var id = Id.fromHex('abcd', '1234');
-            var list = new LookupList(id, Id.zero(), 20);
+            var list = new LookupList(id, 20);
             generateIds(100, function (err, ids) {
                 for (var i = 0; i < ids.length; ++i) {
                     list.insert(new Contact(ids[i]));
@@ -40,18 +40,11 @@ describe('LookupList', function () {
                 cb();
             });
         });
-
-        it('should not insert selfId', function () {
-            var id = Id.fromHex('abcd');
-            var list = new LookupList(Id.zero(), id, 20);
-            list.insert(new Contact(id));
-            list.length.should.equal(0);
-        });
     });
 
     describe('#next()', function () {
         it('should not return the same contact twice', function () {
-            var list = new LookupList(Id.zero(), Id.zero(), 3);
+            var list = new LookupList(Id.zero(), 3);
             list.insert(new Contact(Id.fromHex('af')));
             list.insert(new Contact(Id.fromHex('4a')));
             list.insert(new Contact(Id.fromHex('a3')));
