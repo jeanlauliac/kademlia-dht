@@ -32,8 +32,7 @@ one node, then get it on the other node.
 ```js
 'use strict';
 
-var Dht = require('kademlia-dht');
-var MockRpc = require('kademlia-dht/lib/mock-rpc');
+var kad = require('kademlia-dht');
 
 // Store a value on one side and get it back on the other side.
 //
@@ -48,9 +47,9 @@ function demo(dht1, dht2) {
 // Spawn a node. A node is composed of two elements: the local Dht and the Rpc.
 //
 function spawnNode(endpoint, seeds, cb) {
-    MockRpc.spawn(endpoint, function (err, rpc) {
+    kad.MockRpc.spawn(endpoint, function (err, rpc) {
         if (err) return cb(err);
-        Dht.spawn(rpc, seeds, function (err, dht) {
+        kad.Dht.spawn(rpc, seeds, function (err, dht) {
             if (err) return cb(err);
             cb(err, dht);
         });
@@ -76,13 +75,33 @@ Rpc interface is explained below.
 
 This example is available as `example/demo.js`.
 
+## Notes
+
+A Dht cannot ensure a complete consistency of the returned data. The fact new
+nodes arrive and other exit the network at any time causes variations in the
+lookup algorithm: all nodes resulting from the lookup are not necessarily
+up-to-date all the time. You must take into account this variability when
+processing returned values.
+
+Moreover, a Dht can hardly ensure the authenticity of the values. For instance,
+a technique known as the *Sybil attack* allows attackers to cluster around
+a specific key, accepting any store operation, but then returning a malicious
+value or no value at all instead of the expected one. This kind of attack
+is inherent to the structure of such a distributed system, even though some
+tentative implementations try to counteract *via* trust-based systems.
+
+The following documents have been the basis of this Kademlia implementation:
+
+  * http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
+  * http://xlattice.sourceforge.net/components/protocol/kademlia/specs.html
+
 ## API
 
 ### Class: Dht
 
 #### new Dht(rpc, id)
 
-Create directly the node from an Id. You should never use this directly. 
+Create directly the node from an Id. You should never use this directly.
 
 #### Dht.spawn(rpc, seeds, callback)
 
@@ -93,6 +112,9 @@ Create directly the node from an Id. You should never use this directly.
 Create a brand new Dht. It will try to connect to the seeds, and grab
 knowledge about its nearest nodes. You cannot use a Dht that's not connected
 to some network, hence the need for seeds.
+
+The Dht takes ownership of the rpc, and it should not be used for anything
+else in your application.
 
 #### dht.set(key, value, callback)
 
@@ -116,3 +138,46 @@ will merely be `null`.
 Return immediately the associated value if known locally. You can use this
 method to avoid the callback overhead, but only very few key/value pair are
 available with this technique.
+
+#### dht.close()
+
+Close the Dht and the inner node. No other operation is then possible.
+
+### Class: Rpc
+
+This describe the excepted interface for the `rpc` object provided to
+`Dht.spawn()`.
+
+#### rpc.send(message, endpoint, payload, cb)
+
+  * `message` *String* Type of message, always one of: "ping", "store",
+    "findNode" or "findValue".
+  * `endpoint` *Any* A value representing the 'endpoint' of the node. Generally
+    it will be a pair `{ipAddress, port}`, when the Rpc is implemented over
+    TCP or UDP.
+  * `payload` *Object* An object containing information attached to the
+    message.
+  * `cb(err, result)` *Function* To be called once the message got a reply.
+
+This function must implement a timeout mechanism, and callback with an error
+if so happens. This ensures the Dht does not hang up on a request and properly
+take into account unresponsive nodes.
+
+#### rpc.receive(message, handler)
+
+  * `message` *String* Type of message to handle.
+  * `handler(payload)` *Function* Function locally handling the specified
+    message.
+
+Register a local handler.
+
+The receive handler must be a synchronous operation. The handling function
+returns a result object that must be forwarded to the node initiating the
+request. The handler may throw, in which case an error should be forwarded to
+the remote node; make sure, though, that no local information leaks such as
+stacktraces, because they can contain personal or sensitive information.
+
+#### rpc.close()
+
+Close the Rpc endpoint and prevent any further call to message handlers.
+
