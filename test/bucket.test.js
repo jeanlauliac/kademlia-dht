@@ -70,6 +70,28 @@ describe('Bucket', function () {
         });
     });
 
+    describe('#split()', function () {
+        it('should split', function () {
+            var bucket = new Bucket(4);
+            bucket.store(Contacts[0]);
+            bucket.store(Contacts[1]);
+            bucket.store(Contacts[2]);
+            bucket.store(Contacts[3]);
+
+            var left = new Bucket(4);
+            var right = new Bucket(4);
+            bucket.split(1, left, right);
+            left.length.should.equal(2);
+            right.length.should.equal(2);
+
+            left.obtain(2)[0].should.equal(Contacts[0]);
+            left.obtain(2)[1].should.equal(Contacts[2]);
+
+            right.obtain(2)[0].should.equal(Contacts[1]);
+            right.obtain(2)[1].should.equal(Contacts[3]);
+        });
+    });
+
     describe('#toString()', function () {
         it('should work with empty list', function () {
             bt.toString().should.equal('<( :3: )>');

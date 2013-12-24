@@ -46,26 +46,6 @@ function storeIds(table, ids, cb) {
 }
 
 describe('RoutingTable', function () {
-    describe('#_splitBucket()', function () {
-        it('should split', function () {
-            var bucket = new Bucket(4);
-            bucket.store(CONTACT1);
-            bucket.store(CONTACT2);
-            bucket.store(CONTACT3);
-            bucket.store(CONTACT4);
-
-            var node = RoutingTable._splitBucket(bucket, 1, 4);
-            node.left.length.should.equal(2);
-            node.right.length.should.equal(2);
-
-            node.left.obtain(2)[0].should.equal(CONTACT1);
-            node.left.obtain(2)[1].should.equal(CONTACT3);
-
-            node.right.obtain(2)[0].should.equal(CONTACT2);
-            node.right.obtain(2)[1].should.equal(CONTACT4);
-        });
-    });
-
     describe('#store()', function () {
         it('should observe the splitting rules', function (cb) {
             var table = new RoutingTable(Id.fromKey('foo'), BUCKET_SIZE);
