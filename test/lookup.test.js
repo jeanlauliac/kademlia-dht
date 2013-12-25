@@ -39,7 +39,6 @@ var opts = {
     size: BUCKET_SIZE,
     concurrency: 3,
     findNode: fakeFindNode,
-    selfId: Id.zero()
 };
 
 it('fakeFindNode should return Ids closer to the target', function (cb) {
@@ -83,6 +82,24 @@ describe('Lookup', function () {
                 }
                 cb(); 
             }); 
+        });
+
+        it('should remove errored nodes', function (cb) {
+            var id = Id.fromHex('abcd', '34');
+            var seeds = [new Contact(Id.fromHex('1234'))];
+            var opts = {
+                size: BUCKET_SIZE,
+                concurrency: 3,
+                findNode: function (contact, targetId, cb) {
+                    return process.nextTick(
+                        cb.bind(null, new Error('timed out'))
+                    );
+                }
+            };
+            Lookup.proceed(id, seeds, opts, function (err, contacts) {
+                contacts.should.have.length(0); 
+                return cb();
+            });
         });
     });
 });
