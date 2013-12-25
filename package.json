@@ -22,7 +22,9 @@
     "bin": "./bin"
   },
   "main": "./lib/kademlia-dht.js",
-  "dependencies": {},
+  "dependencies": {
+    "slide": "~1.1.5"
+  },
   "devDependencies": {
     "mocha": "~1.14.0",
     "chai": "~1.8.1",
