@@ -30,7 +30,8 @@
     "chai": "~1.8.1",
     "sinon": "~1.7.3",
     "sinon-chai": "~2.4.0",
-    "jslint": "~0.2.5"
+    "jslint": "~0.2.5",
+    "npmlog": "0.0.6"
   },
   "engines": {
     "node": ">=0.10",

@@ -2,6 +2,8 @@
 
 var Dht = require('../lib/dht');
 var MockRpc = require('../lib/mock-rpc');
+var log = require('npmlog');
+var util = require('util');
 
 // Spawn a node. A node is composed of two elements: the local Dht and the Rpc.
 //
@@ -15,7 +17,7 @@ function spawnNode(endpoint, seeds, cb) {
     });
 }
 
-var nextPort = '1000';
+var nextPort = 1000;
 
 function spawnSome(dhts, seeds, nb, cb) {
     ++nextPort;
@@ -37,8 +39,7 @@ var locals = {};
 
 function setSome(name, dhts, key, ix, cb) {
     var value = Math.random() * 256 | 0;
-    console.log('[%s] set %s=%d on #%s', name, key, value,
-                dhts[ix].rpc.endpoint);
+    log.info('SET!', '%s/%s %s=%d', name, dhts[ix].rpc.endpoint, key, value);
     locals[key] = value;
     dhts[ix].set(key, value, function (err) {
         if (err) return console.log('  ERROR! %s', err.message);
@@ -47,13 +48,12 @@ function setSome(name, dhts, key, ix, cb) {
 }
 
 function getSome(name, dhts, key, ix, cb) {
-    console.log('[%s] get %s on #%s', name, key, dhts[ix].rpc.endpoint);
+    log.info('GET?', '%s/%s %s', name, dhts[ix].rpc.endpoint, key);
     dhts[ix].get(key, function (err, value) {
         if (err) return console.log('  ERROR! %s', err.message);
         if (value !== locals[key]) {
-            console.log('/!\\ warning:' +
-                        ' expected %s=%d but got %s', key,
-                        locals[key], value);
+            log.warn('GET?', 'expected %s=%d but got %s', key,
+                     locals[key], value);
         }
         cb();
     });
@@ -65,13 +65,13 @@ function newNode(name, dhts, cb) {
         ++nextPort;
         if (err) return console.log('  ERROR! %s', err.message);
         dhts.push(dht);
-        console.log('[%s] NEW node! %s', name, dht.rpc.endpoint);
+        log.info('NEW+', '%s/%s', name, dht.rpc.endpoint);
         cb();
     });
 }
 
 function oldNode(name, dhts, ix, cb) {
-    console.log('[%s] REMOVING node! %s', name, dhts[ix].rpc.endpoint);
+    log.info('RMN-', '%s/%s', name, dhts[ix].rpc.endpoint);
     dhts[ix].close();
     dhts.splice(ix, 1);
     process.nextTick(function () {
@@ -105,6 +105,8 @@ function doStuff(name, dhts, count) {
     }, (Math.random() * 20) | 0);
 }
 
+log.heading = 'dht';
+log.info(null, 'spawning %s nodes', 100);
 spawnSome([], [], 100, function (err, dhts) {
     if (err) throw err;
     doStuff('1', dhts, 100);
