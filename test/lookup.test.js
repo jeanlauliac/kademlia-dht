@@ -6,7 +6,7 @@ var Lookup = require('../lib/lookup.js');
 
 var BUCKET_SIZE = 5;
 
-// Return random nodes kind of close to the `targetId`. 
+// Return random nodes kind of close to the `targetId`.
 //
 function fakeFindNode(contact, targetId, cb) {
     setTimeout(function () {
@@ -51,7 +51,7 @@ it('fakeFindNode should return Ids closer to the target', function (cb) {
             for (var i = 0; i < innerContacts.length; ++i) {
                 var dist = targetId.compareDistance(innerContacts[i].id,
                                                     baseId);
-                dist.should.be.at.least(0, 'contact ' + i);             
+                dist.should.be.at.least(0, 'contact ' + i);
             }
             cb();
         });
@@ -80,8 +80,8 @@ describe('Lookup', function () {
                     id.compareDistance(contacts[i].id, max)
                       .should.be.at.least(0);
                 }
-                cb(); 
-            }); 
+                cb();
+            });
         });
 
         it('should remove errored nodes', function (cb) {
@@ -97,7 +97,7 @@ describe('Lookup', function () {
                 }
             };
             Lookup.proceed(id, seeds, opts, function (err, contacts) {
-                contacts.should.have.length(0); 
+                contacts.should.have.length(0);
                 return cb();
             });
         });
