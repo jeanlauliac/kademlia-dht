@@ -20,6 +20,14 @@ resources, like the network. Instead, the implementation of the network layer
 higher-level libraries. That means this DHT implementation is theorically
 adaptable to the browser JS without too much hassle.
 
+**Note:** this implementation is, for now partially complete. It basically
+lacks two things:
+
+   * the handling of time-driven behaviors: key/value pairs expiration,
+     bucket refresh, replication, and pairs republish.
+   * an implementation of the Rpc usable out-of-the-box (it will be done as a
+     separate library) even though it's possible to use your own already;
+
 ## Installation
 
     npm install kademlia-dht

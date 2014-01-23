@@ -6,7 +6,9 @@
     "kademlia",
     "dht",
     "distributed",
-    "hash table"
+    "hash table",
+    "discovery",
+    "sharing"
   ],
   "homepage": "https://github.com/jeanlauliac/kademlia-dht",
   "author": "Jean Lauliac <jean@lauliac.com>",
@@ -21,7 +23,7 @@
     "lib": "./lib",
     "bin": "./bin"
   },
-  "main": "./lib/kademlia-dht.js",
+  "main": "./lib",
   "dependencies": {
     "slide": "~1.1.5"
   },
