@@ -49,7 +49,7 @@ describe('Id', function() {
 
     describe('#distanceTo()', function () {
         it('should yield zero', function () {
-            var id = Id.fromKey('the cake is a lie')
+            var id = Id.fromKey('the cake is a lie');
             var dist = id.distanceTo(id);
             for (var i = 0; i < dist.length; ++i)
                 dist[i].should.equal(0);
@@ -58,7 +58,7 @@ describe('Id', function() {
         it('should handle invalid ids', function () {
             var id = Id.fromKey('the cake is a lie');
             try {
-                var dist = kadmelia.distance(id, 'fubar');
+                var dist = id.distanceTo('fubar');
                 throw new Error('failed');
             } catch (err) {}
         });
@@ -69,7 +69,7 @@ describe('Id', function() {
             var dist = id.distanceTo(id2);
             var target = 'd4a6bfe55a3715cad428cedd03de6e39a04b43b6';
             dist.toString('hex').should.equal(target);
-        })
+        });
     });
 
     describe('#compareDistance()', function () {
@@ -85,7 +85,7 @@ describe('Id', function() {
 
     describe('#equal()', function () {
         it('should return true', function () {
-            var id = Id.fromKey('the cake is a lie')
+            var id = Id.fromKey('the cake is a lie');
             id.equal(id).should.equal(true);
         });
 
@@ -99,7 +99,7 @@ describe('Id', function() {
     describe('#at()', function () {
         it('should let us reconstruct the id', function () {
             var id = Id.fromKey('the cake is a lie');
-            var buf = new Buffer(new Array(Id.SIZE));
+            var buf = new Buffer.alloc(Id.SIZE);
             for (var i = 0; i < Id.BIT_SIZE; ++i) {
                 var bit = id.at(i);
                 if (bit) buf[i/8 | 0] += 1 << (7 - i%8);

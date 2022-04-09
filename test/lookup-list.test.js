@@ -4,6 +4,16 @@ var Id = require('../lib/id.js');
 var Contact = require('../lib/contact.js');
 var LookupList = require('../lib/lookup-list.js');
 
+function generateIds(num, cb, ids) {
+    if (ids === undefined) ids = [];
+    if (num <= 0) return cb(undefined, ids);
+    var id = Id.generate(function(err, buf) {
+        if (err) return cb(err);
+        ids.push(buf);
+        generateIds(num - 1, cb, ids);
+    });
+}
+
 describe('LookupList', function () {
     it('constructor should create empty list', function () {
         var list = new LookupList(Id.zero(), 3);
