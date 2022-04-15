@@ -1,3 +1,9 @@
+⚠️ This repo is unmaintained and out-of-date, uses old JavaScript syntax and idioms. You might have a
+look at the general Kademlia approach, but I wouldn't use any of this as a starting point for another
+project 😉
+
+---
+
 # kademlia-dht
 
 **kademlia-dht** is a javascript, network-agnostic implementation of the
